@@ -7,6 +7,7 @@ import { courseData } from './courseData';
 function CursoPage({ route }) {
   const navigation = useNavigation();
   const { course } = route.params;
+  const amount = 40
   const courseInfo = courseData[course];
 
   const handleCheckout = async () => {
@@ -16,7 +17,7 @@ function CursoPage({ route }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ course }),
+        body: JSON.stringify({ course, amount }),
       });
 
       const session = await response.json();
