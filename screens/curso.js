@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { courseData } from './courseData';
 
-function CursoPage({ route }) {
+function CursoPage() {
   const navigation = useNavigation();
-  const { course } = route.params;
-  const amount = 40
+  const route = useRoute();
+  const { course, success, canceled } = route.params || {};
+
+  const amount = 40;
   const courseInfo = courseData[course];
+
+  useEffect(() => {
+    if (success) {
+      Alert.alert('Pago Exitoso', 'Tu pago ha sido procesado exitosamente.');
+    }
+    if (canceled) {
+      Alert.alert('Pago Cancelado', 'El pago ha sido cancelado.');
+    }
+  }, [success, canceled]);
 
   const handleCheckout = async () => {
     try {
@@ -33,9 +44,13 @@ function CursoPage({ route }) {
     }
   };
 
+  const handleGoBack = () => {
+    navigation.navigate('Home');
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Ionicons name="arrow-back" size={24} color="#6200ee" />
       </TouchableOpacity>
       <Text style={styles.title}>{course}</Text>

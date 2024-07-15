@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Login = ({ navigation }) => {
@@ -17,7 +18,10 @@ const Login = ({ navigation }) => {
         withCredentials: true // Ensure credentials are sent with the request
       });
 
-      console.log(response.data); // You can show this in a message or redirect to another screen
+      const { token, ...userData } = response.data;
+      await AsyncStorage.setItem('access_token', token);
+
+      console.log(userData); // You can show this in a message or redirect to another screen
       navigation.navigate("Home"); // Redirect to the home screen after login
     } catch (error) {
       console.error("Login error:", error);

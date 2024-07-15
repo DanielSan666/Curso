@@ -7,6 +7,7 @@ import DrawerNavigation from './navigation/DrawerNavigation';
 import LogoutButton from './screens/logout';
 import CursoPage from './screens/curso';
 import RegisterPage from './screens/register';
+import profile from './screens/profile';
 
 
 const Stack = createNativeStackNavigator();
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name='Logout' component={LogoutButton} />
         <Stack.Screen name='Curso' component={CursoPage} />
         <Stack.Screen name='Register' component={RegisterPage} />
+        <Stack.Screen name='Profile' component={profile} />
       </Stack.Navigator>
     </NavigationContainer>
   );
