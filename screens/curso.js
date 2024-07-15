@@ -1,14 +1,40 @@
-// CursoPage.js
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { courseData } from '../screens/courseData'; // Ajusta la ruta según tu estructura de proyecto
+import { courseData } from './courseData';
 
 function CursoPage({ route }) {
   const navigation = useNavigation();
   const { course } = route.params;
   const courseInfo = courseData[course];
+
+  // Función para manejar el inicio del flujo de pago
+  const handleCheckout = async () => {
+    try {
+      // Realiza una solicitud al backend para crear una sesión de checkout en Stripe
+      const response = await fetch('http://localhost:5000/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ course }),
+      });
+
+      const session = await response.json();
+
+      // Abre la URL de Stripe para el pago en el navegador externo
+      if (session && session.url) {
+        Linking.openURL(session.url);
+      } else {
+        throw new Error('No se pudo iniciar el pago');
+      }
+    } catch (error) {
+      console.error('Error al iniciar el pago:', error);
+      console.log(courseInfo);
+      Alert.alert('Error', 'No se pudo iniciar el pago. Inténtalo de nuevo más tarde.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -22,6 +48,11 @@ function CursoPage({ route }) {
           <Text style={styles.detail}><Text style={styles.label}>Duración:</Text> {courseInfo.duration}</Text>
           <Text style={styles.detail}><Text style={styles.label}>Nivel:</Text> {courseInfo.level}</Text>
           {/* Otros detalles del curso */}
+
+          {/* Botón de Checkout */}
+          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
+            <Text style={styles.buttonText}>Iniciar Pago</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <Text style={styles.error}>Información del curso no disponible</Text>
@@ -29,6 +60,7 @@ function CursoPage({ route }) {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -64,6 +96,18 @@ const styles = StyleSheet.create({
   error: {
     fontSize: 16,
     color: 'red',
+  },
+  checkoutButton: {
+    backgroundColor: '#6200ee',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
