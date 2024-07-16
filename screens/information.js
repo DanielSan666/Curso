@@ -5,7 +5,9 @@ import CustomHeader from "../navigation/CustomHeader";
 function InformationPage({ navigation }) {
   return (
     <View style={{ flex: 1 }}>
+    <View style={{ marginTop: 35 }}>
       <CustomHeader navigation={navigation} />
+    </View>
       <View style={styles.container}>
         <Text style={styles.title}>Welcome to the Information Screen</Text>
 

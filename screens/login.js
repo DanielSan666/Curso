@@ -1,39 +1,23 @@
 import React, { useState } from "react";
-import { View, Text, Button, TextInput, StyleSheet, TouchableOpacity } from "react-native";
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, Text, Button, TextInput, StyleSheet, Alert } from "react-native";
+import { login } from "../API/API";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:5000/api/login", {
-        email,
-        password,
-      },
-      {
-        withCredentials: true // Ensure credentials are sent with the request
-      });
-
-      const { token, ...userData } = response.data;
-      await AsyncStorage.setItem('access_token', token);
-
-      console.log(userData); // You can show this in a message or redirect to another screen
-      navigation.navigate("Home"); // Redirect to the home screen after login
-    } catch (error) {
-      console.error("Login error:", error);
-      // Here you could show an error message to the user
+    const success = await login(email, password);
+    if (success) {
+      console.log(success)
+      navigation.navigate("Home");
+    } else {
+      Alert.alert("Login failed", "Invalid email or password. Please try again.");
     }
   };
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={24} color="#6200ee" />
-      </TouchableOpacity>
       <View style={styles.card}>
         <Text style={styles.title}>Login</Text>
         <TextInput
@@ -53,6 +37,9 @@ const Login = ({ navigation }) => {
         />
         <View style={styles.buttonContainer}>
           <Button title="Login" onPress={handleLogin} color="#6200ee" />
+          <View style={styles.buttonSpacer}>
+            <Button title="Register" onPress={() => navigation.navigate('Register')} color="#6200ee" />
+          </View>
         </View>
       </View>
     </View>
@@ -104,6 +91,9 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 8,
     overflow: "hidden",
+  },
+  buttonSpacer: {
+    marginTop: 10, // Adds space between the buttons
   },
 });
 

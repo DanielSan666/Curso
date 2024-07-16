@@ -9,7 +9,7 @@ function CursoPage() {
   const route = useRoute();
   const { course, success, canceled } = route.params || {};
 
-  const amount = 40;
+  const amount = 40; // Cantidad fija para la demostración
   const courseInfo = courseData[course];
 
   useEffect(() => {
@@ -23,7 +23,7 @@ function CursoPage() {
 
   const handleCheckout = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/create-checkout-session', {
+      const response = await fetch('http://172.20.104.46:5000/api/create-checkout-session', { // Asegúrate de cambiar la IP según sea necesario
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

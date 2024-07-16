@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import InformationPage from './screens/information';
 import Login from './screens/login';
 import DrawerNavigation from './navigation/DrawerNavigation';
 import LogoutButton from './screens/logout';
@@ -15,8 +14,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Information" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Information" component={InformationPage} />
+      <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
         <Stack.Screen name='Login' component={Login} />
         <Stack.Screen name='Home' component={DrawerNavigation} options={{ headerShown: false }} />
         <Stack.Screen name='Logout' component={LogoutButton} />
