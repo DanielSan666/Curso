@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking, Alert, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { courseData } from './courseData';
@@ -10,6 +10,8 @@ function CursoPage() {
   const { course, success, canceled } = route.params || {};
 
   const courseInfo = courseData[course];
+
+  const amountPago= 40
 
   useEffect(() => {
     if (success) {
@@ -46,7 +48,7 @@ function CursoPage() {
     // Otros detalles necesarios para el pago, según lo requerido por el SDK de Clip
   };
 
-  const handleCheckout = async () => {
+  const handleCheckoutClip = async () => {
     try {
       const response = await fetch('http://192.168.1.86:5000/api/payment-clip', { // Asegúrate de cambiar la IP según sea necesario
         method: 'POST',
@@ -61,6 +63,29 @@ function CursoPage() {
 
       if (session && session.payment_request_url) {
         Linking.openURL(session.payment_request_url);
+      } else {
+        throw new Error('No se pudo iniciar el pago');
+      }
+    } catch (error) {
+      console.error('Error al iniciar el pago:', error);
+      Alert.alert('Error', 'No se pudo iniciar el pago. Inténtalo de nuevo más tarde.');
+    }
+  };
+
+
+  const handleCheckoutStripe = async () => {
+    try {
+      const response = await fetch('http://192.168.1.86:5000/api/payment-stripe', { // Asegúrate de cambiar la IP según sea necesario
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify( {course, amountPago}),
+      });
+      const session = await response.json();
+
+      if (session && session.url) {
+        Linking.openURL(session.url);
       } else {
         throw new Error('No se pudo iniciar el pago');
       }
@@ -86,8 +111,14 @@ function CursoPage() {
           <Text style={styles.detail}><Text style={styles.label}>Duración:</Text> {courseInfo.duration}</Text>
           <Text style={styles.detail}><Text style={styles.label}>Nivel:</Text> {courseInfo.level}</Text>
 
-          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
-            <Text style={styles.buttonText}>Iniciar Pago</Text>
+
+          <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckoutStripe}>
+            <Text style={styles.buttonText}>Iniciar Pago con Stripe</Text>
+            
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.checkoutButtonClip} onPress={handleCheckoutClip}>
+            <Text style={styles.buttonTextClip}>Iniciar Pago con Clip</Text>
             
           </TouchableOpacity>
         </View>
@@ -145,6 +176,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  buttonTextClip: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  checkoutButtonClip: {
+    backgroundColor: '#FC4C02',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
   },
 });
 
