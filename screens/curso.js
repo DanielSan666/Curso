@@ -9,7 +9,6 @@ function CursoPage() {
   const route = useRoute();
   const { course, success, canceled } = route.params || {};
 
-  const amount = 40; // Cantidad fija para la demostración
   const courseInfo = courseData[course];
 
   useEffect(() => {
@@ -21,20 +20,47 @@ function CursoPage() {
     }
   }, [success, canceled]);
 
+  const paymentDetails = {
+    purchase_description: course,
+    currency: 'MXN',
+    amount: 40,
+    metadata: {
+      me_reference_id: `123 `,
+      customer_info: {
+          name: '',
+          email: '',
+          phone: '',
+      }
+    },
+    redirect_url: {
+      success: "https://bufaloscafe.wuaze.com/Menu",
+      error: "https://bufaloscafe.wuaze.com/Menu",
+      default: "https://bufaloscafe.wuaze.com/Menu",
+   },
+    override_settings: {
+      payment_method: ["CARD"],
+    },
+  webhook_url: "https://marketplace-rose-three.vercel.app/api/pedidos/WebHook"
+     
+    // Asegúrate de ajustar esta estructura según la información requerida por Clip
+    // Otros detalles necesarios para el pago, según lo requerido por el SDK de Clip
+  };
+
   const handleCheckout = async () => {
     try {
-      const response = await fetch('http://172.20.104.46:5000/api/create-checkout-session', { // Asegúrate de cambiar la IP según sea necesario
+      const response = await fetch('http://192.168.1.86:5000/api/payment-clip', { // Asegúrate de cambiar la IP según sea necesario
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ course, amount }),
+        body: JSON.stringify( paymentDetails),
       });
 
+      console.log(paymentDetails)
       const session = await response.json();
 
-      if (session && session.url) {
-        Linking.openURL(session.url);
+      if (session && session.payment_request_url) {
+        Linking.openURL(session.payment_request_url);
       } else {
         throw new Error('No se pudo iniciar el pago');
       }
@@ -62,6 +88,7 @@ function CursoPage() {
 
           <TouchableOpacity style={styles.checkoutButton} onPress={handleCheckout}>
             <Text style={styles.buttonText}>Iniciar Pago</Text>
+            
           </TouchableOpacity>
         </View>
       ) : (

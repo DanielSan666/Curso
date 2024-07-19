@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const IP = '192.168.100.11'
+const IP = '192.168.1.86'
 
 export const login = async (email, password) => {
     try {
